@@ -1,53 +1,61 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-export function useRoastResume(file: File | null, language: string) {
-  const [streamData, setStreamData] = useState<string>('');
+export function useRoastResume(file: File | null, language: string, submit: boolean) {
+  const [streamData, setStreamData] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!file) return;
+    if (!file || !submit) return;
 
     const fetchData = async () => {
       setIsLoading(true);
-      setStreamData('');
+      setStreamData("");
       setError(null);
 
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('language', language);
+      formData.append("file", file);
+      formData.append("language", language);
 
       try {
-        const response = await fetch('http://localhost:8000/roast-resume', {
-          method: 'POST',
+        const response = await fetch("http://localhost:8000/roast-resume", {
+          method: "POST",
           body: formData,
           headers: {
-            'Accept': 'text/event-stream',
+            "Accept": "text/event-stream",
           },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to upload file');
+          throw new Error("Failed to upload file");
         }
 
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
+        let accumulatedText = "";
 
-        let accumulatedText = '';
+        // Read chunks of data
+        const processStream = async () => {
+          while (true) {
+            const { done, value } = await reader!.read();
+            if (done) break;
 
-        while (true) {
-          const { done, value } = await reader!.read();
-          if (done) break;
+            // Decode the received chunk into text
+            const chunk = decoder.decode(value, { stream: true });
+            accumulatedText += chunk;
 
-          const chunk = decoder.decode(value, { stream: true });
-          accumulatedText += chunk;
+            // Simulate smooth streaming by appending words incrementally
+            const words = chunk.split(" ");
+            for (const word of words) {
+              setStreamData((prev) => prev + word + " ");
 
-          // Add delay for a smoother effect
-          await new Promise((resolve) => setTimeout(resolve, 50));
+              // Delay for smoother animation (adjust for desired effect)
+              await new Promise((resolve) => setTimeout(resolve, 100)); // 100ms per word
+            }
+          }
+        };
 
-          // Update the UI with accumulated text in a way that it flows naturally
-          setStreamData((prev) => prev + chunk.trim());  // Trim excess spaces
-        }
+        await processStream();
       } catch (e: any) {
         setError(e.message);
       } finally {
@@ -56,7 +64,7 @@ export function useRoastResume(file: File | null, language: string) {
     };
 
     fetchData();
-  }, [file, language]);
+  }, [file, language, submit]);
 
   return { streamData, isLoading, error };
 }

@@ -1,17 +1,25 @@
-'use client'
+"use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRoastResume } from '@/hooks/useRoastResume';  // Assuming the hook is in this file
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useRoastResume } from "@/hooks/useRoastResume";
 
 export function Upload() {
   const [file, setFile] = useState<File | null>(null);
-  const [language, setLanguage] = useState<string>('id');
+  // const [language, setLanguage] = useState<string>("en");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [submit, setSubmit] = useState(false); // New state to handle form submission
+  const language = "id";
 
-  const { streamData, isLoading, error } = useRoastResume(file, language);
+  const { streamData, isLoading, error } = useRoastResume(file, language, submit);
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
@@ -19,10 +27,10 @@ export function Upload() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (selectedFile && selectedFile.type === 'application/pdf') {
+    if (selectedFile && selectedFile.type === "application/pdf") {
       setFile(selectedFile);
     } else {
-      alert('Please select a PDF file.');
+      alert("Please select a PDF file.");
       setFile(null);
     }
   };
@@ -30,33 +38,38 @@ export function Upload() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!file) {
-      alert('Please select a file before submitting.');
+      alert("Please select a file before submitting.");
+      return;
     }
+    // Trigger the upload when the button is clicked
+    setSubmit(true);
   };
 
   return (
-    <Card className="w-full max-w-md bg-white border border-gray-200 shadow-md">
+    <Card className="text-center w-full max-w-6xl bg-white border border-gray-200 shadow-md">
       <CardHeader>
         <CardTitle className="text-gray-800">Upload Your CV</CardTitle>
-        <CardDescription className="text-gray-600">Upload your CV in PDF format for review</CardDescription>
+        <CardDescription className="text-gray-600">
+          Upload your CV in PDF format for review
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid w-full items-center gap-1.5">
-            <Input 
+        <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center space-y-4">
+          <div className="w-1/2 gap-1.5">
+            <Input
               ref={fileInputRef}
-              id="cv" 
-              type="file" 
+              id="cv"
+              type="file"
               accept=".pdf"
               className="hidden"
               onChange={handleFileChange}
             />
-            <Button 
+            <Button
               type="button"
               onClick={handleButtonClick}
               className="w-full bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              {file ? 'Change File' : 'Select File'}
+              {file ? "Change File" : "Select File"}
             </Button>
             {file && (
               <p className="mt-2 text-sm text-gray-600">
@@ -64,12 +77,12 @@ export function Upload() {
               </p>
             )}
           </div>
-          <Button 
-            type="submit" 
-            className="w-full bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-            disabled={!file}
+          <Button
+            type="submit"
+            className="w-1/2 bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            disabled={!file || isLoading} // Disable if loading or no file
           >
-            Upload
+            {isLoading ? "Uploading..." : "Upload"}
           </Button>
         </form>
         <div className="mt-4">
