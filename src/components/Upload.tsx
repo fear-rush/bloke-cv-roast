@@ -1,54 +1,55 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { useRoastResume } from "@/hooks/useRoastResume"
-import { Loader2 } from "lucide-react"
+} from "@/components/ui/card";
+import { useRoastResume } from "@/hooks/useRoastResume";
+import { Loader2 } from "lucide-react";
 
 export function Upload() {
-  const [file, setFile] = useState<File | null>(null)
-  const [submit, setSubmit] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const language = "id"
+  const [file, setFile] = useState<File | null>(null);
+  const [submit, setSubmit] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const language = "id";
 
   const { streamData, isLoading, error } = useRoastResume(
     file,
     language,
     submit
-  )
+  );
 
   const handleButtonClick = () => {
-    fileInputRef.current?.click()
-  }
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
+    const selectedFile = event.target.files?.[0];
     if (selectedFile && selectedFile.type === "application/pdf") {
-      setFile(selectedFile)
-      setSubmit(false)
+      setFile(selectedFile);
+      setSubmit(false);
     } else {
-      alert("Please select a PDF file.")
-      setFile(null)
-      setSubmit(false)
+      alert("Please select a PDF file.");
+      setFile(null);
+      setSubmit(false);
     }
-  }
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+    event.preventDefault();
     if (!file) {
-      alert("Please select a file before submitting.")
-      return
+      alert("Please select a file before submitting.");
+      return;
     }
-    setSubmit(true)
-  }
+    setSubmit(true);
+  };
+
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
@@ -77,6 +78,7 @@ export function Upload() {
                 type="button"
                 onClick={handleButtonClick}
                 className="w-full bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                disabled={isLoading}
               >
                 {file ? "Change File" : "Select File"}
               </Button>
@@ -96,16 +98,17 @@ export function Upload() {
           </form>
         </CardContent>
       </Card>
-      {streamData && (
+      {(isLoading || streamData)&& (
         <Card className="w-full max-w-6xl mt-4">
           <CardContent>
             <div className="mt-4">
+              {error && <p className="text-red-500">Error: {error}</p>}
               {isLoading && (
-                <div className="flex justify-center items-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <div className="flex flex-col justify-center items-center">
+                  <pre className="block text-red-500">Content Warning: The following roast contains harsh content.</pre>
+                  <Loader2 className="h-20 w-20 mt-4 animate-spin text-blue-500" />
                 </div>
               )}
-              {error && <p className="text-red-500">Error: {error}</p>}
               {streamData && (
                 <div className="space-y-2">
                   <pre className="whitespace-pre-wrap">{streamData}</pre>
@@ -116,5 +119,5 @@ export function Upload() {
         </Card>
       )}
     </div>
-  )
+  );
 }
