@@ -1,39 +1,38 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useRef } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useRoastResume } from '@/hooks/useRoastResume';  // Assuming the hook is in this file
 
 export function Upload() {
-  const [file, setFile] = useState<File | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [file, setFile] = useState<File | null>(null);
+  const [language, setLanguage] = useState<string>('id');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { streamData, isLoading, error } = useRoastResume(file, language);
 
   const handleButtonClick = () => {
-    fileInputRef.current?.click()
-  }
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
+    const selectedFile = event.target.files?.[0];
     if (selectedFile && selectedFile.type === 'application/pdf') {
-      setFile(selectedFile)
+      setFile(selectedFile);
     } else {
-      alert('Please select a PDF file.')
-      setFile(null)
+      alert('Please select a PDF file.');
+      setFile(null);
     }
-  }
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (file) {
-      // Here you would typically send the file to your server
-      console.log('Uploading file:', file.name)
-      // Reset the file state after upload
-      setFile(null)
-    } else {
-      alert('Please select a file before submitting.')
+    event.preventDefault();
+    if (!file) {
+      alert('Please select a file before submitting.');
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-md bg-white border border-gray-200 shadow-md">
@@ -73,7 +72,17 @@ export function Upload() {
             Upload
           </Button>
         </form>
+        <div className="mt-4">
+          {isLoading && <p>Uploading and roasting...</p>}
+          {error && <p className="text-red-500">Error: {error}</p>}
+          {streamData && (
+            <div className="space-y-2">
+              {/* Display the streamed data smoothly */}
+              <pre className="whitespace-pre-wrap">{streamData}</pre>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
-  )
+  );
 }
