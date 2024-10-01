@@ -18,7 +18,7 @@ export function useRoastResume(file: File | null, language: string, submit: bool
       formData.append("language", language);
 
       try {
-        const response = await fetch("http://localhost:8000/roast-resume", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}`, {
           method: "POST",
           body: formData,
           headers: {
