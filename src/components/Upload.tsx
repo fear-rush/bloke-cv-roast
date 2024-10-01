@@ -17,13 +17,9 @@ export function Upload() {
   const [file, setFile] = useState<File | null>(null);
   const [submit, setSubmit] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const language = "id";
+  const language = "id"; // Assuming language is "id"
 
-  const { streamData, isLoading, error } = useRoastResume(
-    file,
-    language,
-    submit
-  );
+  const { streamData, isLoading, error } = useRoastResume(file, language, submit);
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
@@ -49,7 +45,6 @@ export function Upload() {
     }
     setSubmit(true);
   };
-
 
   return (
     <div className="w-full flex flex-col justify-center items-center">
@@ -98,11 +93,12 @@ export function Upload() {
           </form>
         </CardContent>
       </Card>
-      {(isLoading || streamData)&& (
+
+      {(isLoading || streamData || error) && (
         <Card className="w-full max-w-6xl mt-4">
           <CardContent>
             <div className="mt-4">
-              {error && <p className="text-red-500">Error: {error}</p>}
+              {error && <p className="text-red-500 text-center">{error}</p>}
               {isLoading && (
                 <div className="flex flex-col justify-center items-center">
                   <pre className="block text-red-500">Content Warning: The following roast contains harsh content.</pre>

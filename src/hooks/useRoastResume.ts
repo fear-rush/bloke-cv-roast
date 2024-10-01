@@ -22,9 +22,14 @@ export function useRoastResume(file: File | null, language: string, submit: bool
           method: "POST",
           body: formData,
           headers: {
-            "Accept": "text/event-stream",
+            Accept: "text/event-stream",
           },
         });
+
+        if (response.status === 429) {
+          setError("Today's limit is reached, try again tomorrow.");
+          return;
+        }
 
         if (!response.ok) {
           throw new Error("Failed to upload file");
@@ -55,9 +60,8 @@ export function useRoastResume(file: File | null, language: string, submit: bool
 
         await processStream();
       } catch (e) {
-        // Cast to Error to avoid using 'any'
-        const error = e instanceof Error ? e.message : "An unexpected error occurred.";
-        setError(error);
+        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
