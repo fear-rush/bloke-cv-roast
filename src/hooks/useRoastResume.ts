@@ -32,7 +32,6 @@ export function useRoastResume(file: File | null, language: string, submit: bool
 
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
-        let accumulatedText = "";
 
         // Read chunks of data
         const processStream = async () => {
@@ -42,7 +41,6 @@ export function useRoastResume(file: File | null, language: string, submit: bool
 
             // Decode the received chunk into text
             const chunk = decoder.decode(value, { stream: true });
-            accumulatedText += chunk;
 
             // Simulate smooth streaming by appending words incrementally
             const words = chunk.split(" ");
@@ -56,8 +54,10 @@ export function useRoastResume(file: File | null, language: string, submit: bool
         };
 
         await processStream();
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e) {
+        // Cast to Error to avoid using 'any'
+        const error = e instanceof Error ? e.message : "An unexpected error occurred.";
+        setError(error);
       } finally {
         setIsLoading(false);
       }
