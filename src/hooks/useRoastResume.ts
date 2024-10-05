@@ -31,6 +31,11 @@ export function useRoastResume(file: File | null, language: string, submit: bool
           return;
         }
 
+        if (response.status === 413) {
+          setError("File is too large. Max size is 2.0 MB");
+          return;
+        }
+
         if (!response.ok) {
           throw new Error("Failed to upload file");
         }
