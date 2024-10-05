@@ -1,46 +1,23 @@
-"use client"
-
-import { Github, ChevronDown } from "lucide-react"
+import { Github } from "lucide-react"
 import Link from "next/link"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
 
-  const githubUsers = {
-    user1: "https://github.com/fear-rush",
-    user2: "https://github.com/0xrsydn"
-  }
+  const githubUrl = "https://github.com/fear-rush/bloke-cv-roast"
 
   return (
     <footer className="w-full p-4 bg-white">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex space-x-4">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="p-0">
-                <Github className="h-6 w-6 text-gray-600 hover:text-gray-800" />
-                <ChevronDown className="h-4 w-4 ml-1 text-gray-600" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-40 p-0">
-              <Link href={githubUsers.user1} target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" className="w-full justify-start">
-                  fear-rush
-                </Button>
-              </Link>
-              <Link href={githubUsers.user2} target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" className="w-full justify-start">
-                  0xrsydn
-                </Button>
-              </Link>
-            </PopoverContent>
-          </Popover>
-        </div>
+      <div className="container mx-auto flex justify-center items-center">
         <p className="text-sm text-gray-600">
           &copy; {currentYear} fear-rush & 0xrsydn. All rights reserved.
         </p>
+        <Link href={githubUrl} target="_blank" rel="noopener noreferrer">
+          <Button variant="ghost" size="icon" className="ml-2">
+            <Github className="h-6 w-6 text-gray-600 hover:text-gray-800" />
+          </Button>
+        </Link>
       </div>
     </footer>
   )
